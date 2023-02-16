@@ -96,6 +96,8 @@ public class UserController {
     ArrayList<User> matchingUsers = userCollection
       .find(combinedFilter)
       .sort(sortingOrder)
+      // .into seems to be telling Mongo how it will format the data returned (as an
+      // ArrayList<>)
       .into(new ArrayList<>());
 
     // Set the JSON body of the response to be the list of users returned by the database.
@@ -110,7 +112,7 @@ public class UserController {
   private Bson constructFilter(Context ctx) {
     List<Bson> filters = new ArrayList<>(); // start with a blank document
 
-    if (ctx.queryParamMap().containsKey(AGE_KEY)) {
+    if (ctx.queryParamMap().containsKey(AGE_KEY)) /* .containsKey("age") */ {
       int targetAge = ctx.queryParamAsClass(AGE_KEY, Integer.class)
         .check(it -> it > 0, "User's age must be greater than zero")
         .check(it -> it < REASONABLE_AGE_LIMIT, "User's age must be less than " + REASONABLE_AGE_LIMIT)
@@ -118,16 +120,23 @@ public class UserController {
       filters.add(eq(AGE_KEY, targetAge));
     }
     if (ctx.queryParamMap().containsKey(COMPANY_KEY)) {
+      // options: "i" ignores the case, we're using regex() as the filter to
+      // compare the string parameter "company" and match part of the string,
+      // not the entire thing, we may need this for other string queries
       filters.add(regex(COMPANY_KEY,  Pattern.quote(ctx.queryParam(COMPANY_KEY)), "i"));
     }
     if (ctx.queryParamMap().containsKey(ROLE_KEY)) {
       String role = ctx.queryParamAsClass(ROLE_KEY, String.class)
         .check(it -> it.matches(ROLE_REGEX), "User must have a legal user role")
         .get();
+      // this filter only has to be eq() [equals] because we use a drop down to select
+      // from one of the three role options
       filters.add(eq(ROLE_KEY, role));
     }
 
     // Combine the list of filters into a single filtering document.
+    // if filters.isEmpty(), combinedFilter = new Document()
+    // else, combinedFilter = and(filters);
     Bson combinedFilter = filters.isEmpty() ? new Document() : and(filters);
 
     return combinedFilter;
@@ -139,6 +148,8 @@ public class UserController {
     // "asc") to specify the sort order.
     String sortBy = Objects.requireNonNullElse(ctx.queryParam("sortby"), "name");
     String sortOrder = Objects.requireNonNullElse(ctx.queryParam("sortorder"), "asc");
+    // if the sortOrder is "desc" then sortingOrder (Bson) = Sorts.descending() and whatever
+    // we told Mongo to sort by (it'll be one of our HTTP parameters).
     Bson sortingOrder = sortOrder.equals("desc") ?  Sorts.descending(sortBy) : Sorts.ascending(sortBy);
     return sortingOrder;
   }

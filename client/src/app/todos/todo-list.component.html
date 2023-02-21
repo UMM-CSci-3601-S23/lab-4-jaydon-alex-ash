@@ -1,1 +1,107 @@
-<p>todo-list works!</p>
+<div class="flex-row">
+    <div class="flex-1" fxFlex.gt-sm="80" fxFlexOffset.gt-sm="10">
+
+      <mat-card appearance="outlined" class="search-card">
+        <mat-card-title class="todo-list-title">Todos</mat-card-title>
+        <mat-card-content class="flex-col" >
+
+          <div class="flex-row gap-10 flex-wrap">
+            <!-- Examples of filtering in Angular -->
+
+            <mat-form-field class="input-field">
+              <mat-label>Status</mat-label>
+              <mat-select (selectionChange)="getTodosFromServer()" [(ngModel)]="todoStatus" data-test="todoStatusSelect">
+                <mat-option>--</mat-option>
+                <mat-option value="complete">Complete</mat-option>
+                <mat-option value="incomplete">Incomplete</mat-option>
+              </mat-select>
+              <mat-hint>Filtered on server</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field class="input-field">
+              <mat-label>Category</mat-label>
+              <input matInput data-test="todoCategoryInput" placeholder="Filter by category"
+              [(ngModel)]="todoCategory" (input)="updateFilter()">
+              <mat-hint>Filtered on client</mat-hint>
+            </mat-form-field>
+
+            <!-- This one filters on the server -->
+            <mat-form-field class="input-field">
+              <mat-label>Sort by field</mat-label>
+              <mat-select (selectionChange)="getTodosFromServer()" [(ngModel)]="todoSort" data-test="todoSortSelect">
+                <mat-option>--</mat-option>
+                <mat-option value="owner">Owner</mat-option>
+                <mat-option value="body">Body</mat-option>
+                <mat-option value="status">Status</mat-option>
+                <mat-option value="category">Category</mat-option>
+              </mat-select>
+              <mat-hint>Filtered on server</mat-hint>
+            </mat-form-field>
+
+          </div>
+
+          <div class="flex-row gap-10 flex-wrap">
+            <!-- Examples of filtering on the server -->
+
+            <mat-form-field class="input-field">
+              <mat-label>Owner</mat-label>
+              <input matInput data-test="todoOwnerInput" placeholder="Filter by owner"
+              [(ngModel)]="todoOwner" (input)="getTodosFromServer()">
+              <mat-hint>Filtered on server</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field class="input-field">
+              <mat-label>Body</mat-label>
+              <input matInput data-test="todoBodyInput" placeholder="Filter by body"
+              [(ngModel)]="todoBody" (input)="updateFilter()">
+              <mat-hint>Filtered on client</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field class="input-field">
+              <mat-label>Limit</mat-label>
+              <input matInput data-test="todoLimitInput" type="number" placeholder="Filter by limit"
+              min="0" [(ngModel)]="todoLimit" (input)="getTodosFromServer()">
+              <mat-hint>Filtered on server</mat-hint>
+            </mat-form-field>
+
+          </div>
+
+          <br>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="flex-row">
+    <div class="flex-1" fxFlex.gt-sm="80" fxFlexOffset.gt-sm="10" *ngIf="serverFilteredTodos; else todosError" >
+
+        <!-- List view -->
+        <mat-card appearance="outlined" *ngSwitchCase="'list'">
+          <mat-card-content>
+            <mat-nav-list class="todo-nav-list">
+              <h3 mat-subheader>Todos</h3>
+              <a mat-list-item *ngFor="let todo of this.filteredTodos" [routerLink]="['/todos', todo._id]" class="todo-list-item">
+                <span matListItemTitle mat-line class="todo-list-category"> {{todo.category}} </span>
+                <span matListItemLine class="todo-list-body"> {{todo.body}} </span>
+              </a>
+            </mat-nav-list>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+
+      <!-- Maybe this should be a pop-up instead of just a text message? Not sure. -->
+      <ng-template #todosError>
+        <div class="flex-1" fxFlex.gt-sm="80" fxFlexOffset.gt-sm="10" class="user-error">
+          <mat-error>
+            There was a problem loading the todos. Possibly the server is down or perhaps there are network
+            issues.
+          </mat-error>
+          <mat-error>
+            Please wait a bit and try again or start the server.
+          </mat-error>
+        </div>
+      </ng-template>
+
+    </div>

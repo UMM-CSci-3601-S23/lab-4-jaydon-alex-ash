@@ -76,7 +76,7 @@
     <div class="flex-1" fxFlex.gt-sm="80" fxFlexOffset.gt-sm="10" *ngIf="serverFilteredTodos; else todosError" >
 
         <!-- List view -->
-        <mat-card appearance="outlined" *ngSwitchCase="'list'">
+        <mat-card appearance="outlined">
           <mat-card-content>
             <mat-nav-list class="todo-nav-list">
               <h3 mat-subheader>Todos</h3>
@@ -104,4 +104,5 @@
         </div>
       </ng-template>
 
-    </div>
+
+

@@ -16,8 +16,8 @@ describe('Todo list', () => {
     page.getTodoTitle().should('have.text', 'Todos');
   });
 
-  it('Should show 10 todos in list view', () => {
-    page.getTodoListItems().should('have.length', 10);
+  it('Should show 300 todos in list view', () => {
+    page.getTodoListItems().should('have.length', 300);
   });
 
   it('Should type something in the owner filter and check that it returned correct elements', () => {
@@ -37,7 +37,7 @@ describe('Todo list', () => {
 
   it('Should type something in the body filter and check that it returned correct elements', () => {
     // Filter for body 'aaaa'
-    cy.get('[data-test=todoBodyInput]').type('aaaa');
+    cy.get('[data-test=todoBodyInput]').type('a');
 
     page.getTodoListItems().should('have.lengthOf.above', 0);
 

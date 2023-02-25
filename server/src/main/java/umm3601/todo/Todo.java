@@ -1,4 +1,4 @@
-package umm3601.user;
+package umm3601.todo;
 
 import org.mongojack.Id;
 import org.mongojack.ObjectId;

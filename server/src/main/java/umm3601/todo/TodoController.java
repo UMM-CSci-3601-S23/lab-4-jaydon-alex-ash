@@ -1,21 +1,21 @@
-package umm3601.user;
+package umm3601.todo;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.regex;
+//import static com.mongodb.client.model.Filters.regex;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+/*import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.regex.Pattern;*/
 
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Sorts;
-import com.mongodb.client.result.DeleteResult;
+/*import com.mongodb.client.model.Sorts;
+import com.mongodb.client.result.DeleteResult;*/
 
 import org.bson.Document;
 import org.bson.UuidRepresentation;
@@ -29,81 +29,81 @@ import io.javalin.http.HttpStatus;
 import io.javalin.http.NotFoundResponse;
 
 /**
- * Controller that manages requests for info about users.
+ * Controller that manages requests for info about todos.
  */
-public class UserController {
+public class TodoController {
 
-  static final String AGE_KEY = "age";
+  /*static final String AGE_KEY = "age";
   static final String COMPANY_KEY = "company";
   static final String ROLE_KEY = "role";
 
   private static final int REASONABLE_AGE_LIMIT = 150;
   private static final String ROLE_REGEX = "^(admin|editor|viewer)$";
-  public static final String EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+  public static final String EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";*/
 
-  private final JacksonMongoCollection<User> userCollection;
+  private final JacksonMongoCollection<Todo> todoCollection;
 
   /**
-   * Construct a controller for users.
+   * Construct a controller for todos.
    *
-   * @param database the database containing user data
+   * @param database the database containing todo data
    */
-  public UserController(MongoDatabase database) {
-    userCollection = JacksonMongoCollection.builder().build(
+  public TodoController(MongoDatabase database) {
+    todoCollection = JacksonMongoCollection.builder().build(
         database,
-        "users",
-        User.class,
+        "todos",
+        Todo.class,
         UuidRepresentation.STANDARD);
   }
 
   /**
-   * Set the JSON body of the response to be the single user
+   * Set the JSON body of the response to be the single todo
    * specified by the `id` parameter in the request
    *
    * @param ctx a Javalin HTTP context
    */
-  public void getUser(Context ctx) {
+  public void getTodo(Context ctx) {
     String id = ctx.pathParam("id");
-    User user;
+    Todo todo;
 
     try {
-      user = userCollection.find(eq("_id", new ObjectId(id))).first();
+      todo = todoCollection.find(eq("_id", new ObjectId(id))).first();
     } catch (IllegalArgumentException e) {
-      throw new BadRequestResponse("The requested user id wasn't a legal Mongo Object ID.");
+      throw new BadRequestResponse("The requested todo id wasn't a legal Mongo Object ID.");
     }
-    if (user == null) {
-      throw new NotFoundResponse("The requested user was not found");
+    if (todo == null) {
+      throw new NotFoundResponse("The requested todo was not found");
     } else {
-      ctx.json(user);
+      ctx.json(todo);
       ctx.status(HttpStatus.OK);
     }
   }
 
   /**
-   * Set the JSON body of the response to be a list of all the users returned from the database
+   * Set the JSON body of the response to be a list of all the todos returned from the database
    * that match any requested filters and ordering
    *
    * @param ctx a Javalin HTTP context
    */
-  public void getUsers(Context ctx) {
+  public void getTodos(Context ctx) {
     Bson combinedFilter = constructFilter(ctx);
     Bson sortingOrder = constructSortingOrder(ctx);
 
     // All three of the find, sort, and into steps happen "in parallel" inside the
-    // database system. So MongoDB is going to find the users with the specified
+    // database system. So MongoDB is going to find the todos with the specified
     // properties, return those sorted in the specified manner, and put the
     // results into an initially empty ArrayList.
-    ArrayList<User> matchingUsers = userCollection
+    ArrayList<Todo> matchingTodos = todoCollection
       .find(combinedFilter)
       .sort(sortingOrder)
       // .into seems to be telling Mongo how it will format the data returned (as an
       // ArrayList<>)
       .into(new ArrayList<>());
 
-    // Set the JSON body of the response to be the list of users returned by the database.
+    // Set the JSON body of the response to be the list of todos returned by the database.
     // According to the Javalin documentation (https://javalin.io/documentation#context),
     // this calls result(jsonString), and also sets content type to json
-    ctx.json(matchingUsers);
+    ctx.json(matchingTodos);
 
     // Explicitly set the context status to OK
     ctx.status(HttpStatus.OK);
@@ -112,10 +112,10 @@ public class UserController {
   private Bson constructFilter(Context ctx) {
     List<Bson> filters = new ArrayList<>(); // start with a blank document
 
-    if (ctx.queryParamMap().containsKey(AGE_KEY)) /* .containsKey("age") */ {
+    /*if (ctx.queryParamMap().containsKey(AGE_KEY)) /* .containsKey("age") */ /*{
       int targetAge = ctx.queryParamAsClass(AGE_KEY, Integer.class)
-        .check(it -> it > 0, "User's age must be greater than zero")
-        .check(it -> it < REASONABLE_AGE_LIMIT, "User's age must be less than " + REASONABLE_AGE_LIMIT)
+        .check(it -> it > 0, "Todo's age must be greater than zero")
+        .check(it -> it < REASONABLE_AGE_LIMIT, "Todo's age must be less than " + REASONABLE_AGE_LIMIT)
         .get();
       filters.add(eq(AGE_KEY, targetAge));
     }
@@ -127,7 +127,7 @@ public class UserController {
     }
     if (ctx.queryParamMap().containsKey(ROLE_KEY)) {
       String role = ctx.queryParamAsClass(ROLE_KEY, String.class)
-        .check(it -> it.matches(ROLE_REGEX), "User must have a legal user role")
+        .check(it -> it.matches(ROLE_REGEX), "Todo must have a legal todo role")
         .get();
       // this filter only has to be eq() [equals] because we use a drop down to select
       // from one of the three role options
@@ -136,7 +136,7 @@ public class UserController {
 
     // Combine the list of filters into a single filtering document.
     // if filters.isEmpty(), combinedFilter = new Document()
-    // else, combinedFilter = and(filters);
+    // else, combinedFilter = and(filters);*/
     Bson combinedFilter = filters.isEmpty() ? new Document() : and(filters);
 
     return combinedFilter;
@@ -146,62 +146,63 @@ public class UserController {
     // Sort the results. Use the `sortby` query param (default "name")
     // as the field to sort by, and the query param `sortorder` (default
     // "asc") to specify the sort order.
-    String sortBy = Objects.requireNonNullElse(ctx.queryParam("sortby"), "name");
+    /*String sortBy = Objects.requireNonNullElse(ctx.queryParam("sortby"), "name");
     String sortOrder = Objects.requireNonNullElse(ctx.queryParam("sortorder"), "asc");
     // if the sortOrder is "desc" then sortingOrder (Bson) = Sorts.descending() and whatever
     // we told Mongo to sort by (it'll be one of our HTTP parameters).
-    Bson sortingOrder = sortOrder.equals("desc") ?  Sorts.descending(sortBy) : Sorts.ascending(sortBy);
-    return sortingOrder;
+    Bson sortingOrder = sortOrder.equals("desc") ?  Sorts.descending(sortBy) : Sorts.ascending(sortBy);*/
+    return new Document();
   }
 
   /**
-   * Add a new user using information from the context
-   * (as long as the information gives "legal" values to User fields)
+   * Add a new todo using information from the context
+   * (as long as the information gives "legal" values to Todo fields)
    *
    * @param ctx a Javalin HTTP context
    */
-  public void addNewUser(Context ctx) {
+  /*public void addNewTodo(Context ctx) {
     /*
      * The follow chain of statements uses the Javalin validator system
-     * to verify that instance of `User` provided in this context is
-     * a "legal" user. It checks the following things (in order):
-     *    - The user has a value for the name (`usr.name != null`)
-     *    - The user name is not blank (`usr.name.length > 0`)
+     * to verify that instance of `Todo` provided in this context is
+     * a "legal" todo. It checks the following things (in order):
+     *    - The todo has a value for the name (`usr.name != null`)
+     *    - The todo name is not blank (`usr.name.length > 0`)
      *    - The provided email is valid (matches EMAIL_REGEX)
      *    - The provided age is > 0
      *    - The provided role is valid (one of "admin", "editor", or "viewer")
      *    - A non-blank company is provided
      */
-    User newUser = ctx.bodyValidator(User.class)
-      .check(usr -> usr.name != null && usr.name.length() > 0, "User must have a non-empty user name")
-      .check(usr -> usr.email.matches(EMAIL_REGEX), "User must have a legal email")
-      .check(usr -> usr.age > 0, "User's age must be greater than zero")
-      .check(usr -> usr.age < REASONABLE_AGE_LIMIT, "User's age must be less than " + REASONABLE_AGE_LIMIT)
-      .check(usr -> usr.role.matches(ROLE_REGEX), "User must have a legal user role")
-      .check(usr -> usr.company != null && usr.company.length() > 0, "User must have a non-empty company name")
+    /*
+    Todo newTodo = ctx.bodyValidator(Todo.class)
+      .check(usr -> usr.name != null && usr.name.length() > 0, "Todo must have a non-empty todo name")
+      .check(usr -> usr.email.matches(EMAIL_REGEX), "Todo must have a legal email")
+      .check(usr -> usr.age > 0, "Todo's age must be greater than zero")
+      .check(usr -> usr.age < REASONABLE_AGE_LIMIT, "Todo's age must be less than " + REASONABLE_AGE_LIMIT)
+      .check(usr -> usr.role.matches(ROLE_REGEX), "Todo must have a legal todo role")
+      .check(usr -> usr.company != null && usr.company.length() > 0, "Todo must have a non-empty company name")
       .get();
 
-    // Generate a user avatar (you won't need this part for todos)
-    newUser.avatar = generateAvatar(newUser.email);
+    // Generate a todo avatar (you won't need this part for todos)
+    newTodo.avatar = generateAvatar(newTodo.email);
 
-    userCollection.insertOne(newUser);
+    todoCollection.insertOne(newTodo);
 
-    ctx.json(Map.of("id", newUser._id));
+    ctx.json(Map.of("id", newTodo._id));
     // 201 is the HTTP code for when we successfully
-    // create a new resource (a user in this case).
+    // create a new resource (a todo in this case).
     // See, e.g., https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
     // for a description of the various response codes.
     ctx.status(HttpStatus.CREATED);
-  }
+  }*/
 
   /**
-   * Delete the user specified by the `id` parameter in the request.
+   * Delete the todo specified by the `id` parameter in the request.
    *
    * @param ctx a Javalin HTTP context
    */
-  public void deleteUser(Context ctx) {
+  /*public void deleteTodo(Context ctx) {
     String id = ctx.pathParam("id");
-    DeleteResult deleteResult = userCollection.deleteOne(eq("_id", new ObjectId(id)));
+    DeleteResult deleteResult = todoCollection.deleteOne(eq("_id", new ObjectId(id)));
     if (deleteResult.getDeletedCount() != 1) {
       ctx.status(HttpStatus.NOT_FOUND);
       throw new NotFoundResponse(
@@ -210,30 +211,7 @@ public class UserController {
           + "; perhaps illegal ID or an ID for an item not in the system?");
     }
     ctx.status(HttpStatus.OK);
-  }
-
-  /**
-   * Utility function to generate an URI that points
-   * at a unique avatar image based on a user's email.
-   *
-   * This uses the service provided by gravatar.com; there
-   * are numerous other similar services that one could
-   * use if one wished.
-   *
-   * @param email the email to generate an avatar for
-   * @return a URI pointing to an avatar image
-   */
-  private String generateAvatar(String email) {
-    String avatar;
-    try {
-      // generate unique md5 code for identicon
-      avatar = "https://gravatar.com/avatar/" + md5(email) + "?d=identicon";
-    } catch (NoSuchAlgorithmException ignored) {
-      // set to mystery person
-      avatar = "https://gravatar.com/avatar/?d=mp";
-    }
-    return avatar;
-  }
+  }*/
 
   /**
    * Utility function to generate the md5 hash for a given string

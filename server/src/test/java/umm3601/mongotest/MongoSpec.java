@@ -59,6 +59,7 @@ import org.junit.jupiter.api.Test;
 public class MongoSpec {
 
   private MongoCollection<Document> userDocuments;
+  private MongoCollection<Document> todoDocuments;
 
   private static MongoClient mongoClient;
   private static MongoDatabase db;
@@ -106,7 +107,30 @@ public class MongoSpec {
         .append("company", "Frogs, Inc.")
         .append("email", "jamie@frogs.com"));
 
+    todoDocuments = db.getCollection("todos");
+    todoDocuments.drop();
+    List<Document> testTodos = new ArrayList<>();
+    testTodos.add(
+      new Document()
+      .append("owner", "Fry")
+      .append("status", true)
+      .append("body", "Lorem ipsum")
+      .append("category", "video games"));
+    testTodos.add(
+      new Document()
+      .append("owner", "Workman")
+      .append("status", false)
+      .append("body", "dolor sit amet")
+      .append("category", "homework"));
+    testTodos.add(
+      new Document()
+      .append("owner", "Roberta")
+      .append("status", true)
+      .append("body", "Lorem ipsum")
+      .append("category", "software design"));
+
     userDocuments.insertMany(testUsers);
+    todoDocuments.insertMany(testTodos);
   }
 
   private List<Document> intoList(MongoIterable<Document> documents) {

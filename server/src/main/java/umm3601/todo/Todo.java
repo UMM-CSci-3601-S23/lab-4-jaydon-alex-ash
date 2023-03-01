@@ -1,4 +1,4 @@
-package umm3601.user;
+package umm3601.todo;
 
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -37,13 +37,13 @@ public class Todo {
     if (!(obj instanceof Todo)) {
       return false;
     }
-    User other = (Todo) obj;
+    Todo other = (Todo) obj;
     return _id.equals(other._id);
   }
 
   @Override
   public int hashCode() {
-    // This means that equal Todos will hash the same, which is good.
+    // This means that equal Users will hash the same, which is good.
     return _id.hashCode();
   }
 }

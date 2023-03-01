@@ -76,12 +76,16 @@
     <div class="flex-1" fxFlex.gt-sm="80" fxFlexOffset.gt-sm="10" *ngIf="serverFilteredTodos; else todosError" >
 
         <!-- List view -->
+        <!-- TODO: make this look nicer please pretty please -->
         <mat-card appearance="outlined">
           <mat-card-content>
             <mat-nav-list class="todo-nav-list">
               <h3 mat-subheader>Todos</h3>
-              <a mat-list-item *ngFor="let todo of this.filteredTodos" [routerLink]="['/todos', todo._id]" class="todo-list-item">
-                <span matListItemTitle mat-line class="todo-list-category"> {{todo.category}} </span>
+              <a mat-list-item *ngFor="let todo of this.filteredTodos" class="todo-list-item">
+                <div matListItemTitle mat-line class="todo-list-owner"> {{todo.owner}} </div>
+                <div class="complete-todo" *ngIf="todo.status" style="color:green">Complete</div>
+                <div class="incomplete-todo" *ngIf="!todo.status" style="color:red">Incomplete</div>
+                <span matListItemLine mat-line class="todo-list-category"> {{todo.category}} </span>
                 <span matListItemLine class="todo-list-body"> {{todo.body}} </span>
               </a>
             </mat-nav-list>

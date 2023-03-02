@@ -24,15 +24,10 @@ describe('Todo list', () => {
     // Filter for todo 'Roberta'
     cy.get('[data-test=todoOwnerInput]').type('Roberta');
 
-    /*// All of the todo cards should have the name we are filtering by
-    page.getTodoCards().each(e => {
-      cy.wrap(e).find('.todo-card-name').should('have.text', 'Lynn Ferguson');
+    // All of the todo cards should have the owner we are filtering by
+    page.getTodoListItems().each(e => {
+      cy.wrap(e).find('.todo-list-owner').should('contain.text', 'Roberta');
     });
-
-    // (We check this two ways to show multiple ways to check this)
-    page.getTodoCards().find('.todo-card-name').each(el =>
-      expect(el.text()).to.equal('Lynn Ferguson')
-    );*/
   });
 
   it('Should type something in the body filter and check that it returned correct elements', () => {
@@ -41,52 +36,58 @@ describe('Todo list', () => {
 
     page.getTodoListItems().should('have.lengthOf.above', 0);
 
-    /*// All of the todo cards should have the body we are filtering by
-    page.getTodoCards().find('.todo-card-company').each(card => {
-      cy.wrap(card).should('have.text', 'OHMNET');
-    });*/
+    // All of the todo list items should have the body we are filtering by
+    page.getTodoListItems().find('.todo-list-body').each(list => {
+      cy.wrap(list).should('contain.text', 'a');
+    });
   });
 
   it('Should type something partial in the body filter and check that it returned correct elements', () => {
     // Filter for companies that contain 'ti'
     cy.get('[data-test=todoBodyInput]').type('ti');
 
-    /*page.getTodoListItems().should('have.lengthOf', 2);
-
-    // Each todo card's company name should include the text we are filtering by
-    page.getTodoCards().each(e => {
-      cy.wrap(e).find('.todo-card-company').should('include.text', 'TI');
-    });*/
+    // Each todo list items's body should include the text we are filtering by
+    page.getTodoListItems().each(e => {
+      cy.wrap(e).find('.todo-list-body').should('include.text', 'ti');
+    });
   });
 
   it('Should type something in the category filter and check that it returned correct elements', () => {
     // Filter for todos of category 'homework'
     cy.get('[data-test=todoCategoryInput]').type('homework');
 
-    /*page.getTodoCards().should('have.lengthOf', 3);
-
-    // Go through each of the cards that are being shown and get the names
-    page.getTodoCards().find('.todo-card-name')
-      // We should see these todos whose age is 27
-      .should('contain.text', 'Stokes Clayton')
-      .should('contain.text', 'Bolton Monroe')
-      .should('contain.text', 'Merrill Parker')
-      // We shouldn't see these todos
-      .should('not.contain.text', 'Connie Stewart')
-      .should('not.contain.text', 'Lynn Ferguson');*/
+    // Each todo list items's category should include the text we are filtering by
+    page.getTodoListItems().each(e => {
+      cy.wrap(e).find('.todo-list-category').should('include.text', 'homework');
+    });
   });
 
-  it('Should select a status and check that it returned correct elements', () => {
+  it('Should select a complete status and check that it returned correct elements', () => {
     // Filter for status 'complete');
     page.selectStatus('complete');
 
-    /*// Some of the todos should be listed
+    // Some of the todos should be listed
     page.getTodoListItems().should('have.lengthOf.above', 0);
 
-    // All of the todo list items that show should have the role we are looking for
-    page.getTodoListItems().each(el => {
-      cy.wrap(el).find('.todo-list-role').should('contain', 'viewer');
-    });*/
+    // All of the todo list items that show should have the status we are looking for
+    page.getTodoListItems().each($e => {
+      cy.wrap($e).find('.todo-list-status').as('status');
+      cy.get('@status').find('.todo-list-status-complete').should('contain.text', 'Complete');
+    });
+  });
+
+  it('Should select an incomplete status and check that it returned correct elements', () => {
+    // Filter for status 'incomplete');
+    page.selectStatus('incomplete');
+
+    // Some of the todos should be listed
+    page.getTodoListItems().should('have.lengthOf.above', 0);
+
+    // All of the todo list items that show should have the status we are looking for
+    page.getTodoListItems().each($e => {
+      cy.wrap($e).find('.todo-list-status').as('status');
+      cy.get('@status').find('.todo-list-status-incomplete').should('contain.text', 'Incomplete');
+    });
   });
 
   /*it('Should click add todo and go to the right URL', () => {

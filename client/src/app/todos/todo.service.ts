@@ -63,7 +63,7 @@ export class TodoService {
    * @param filters the map of key-value pairs used for the filtering
    * @returns an array of `Todos` matching the given filters
    */
-  filterTodos(todos: Todo[], filters: { category?: string; status?: string; body?: string }): Todo[] {
+  filterTodos(todos: Todo[], filters: { category?: string; /*status?: string;*/ body?: string }): Todo[] {
     let filteredTodos = todos;
     if (filters.category) {
       filters.category = filters.category.toLowerCase();
@@ -75,12 +75,12 @@ export class TodoService {
       filteredTodos = filteredTodos.filter(todo => todo.body.toLowerCase().indexOf(filters.body) !== -1);
     }
 
-    if (filters.status) {
+    /*if (filters.status) {
       let booleanStatus: boolean;
       if(filters.status === 'complete') { booleanStatus = true; }
       else if(filters.status === 'incomplete') { booleanStatus = false; };
       filteredTodos = filteredTodos.filter(todo => todo.status === booleanStatus);
-    }
+    }*/
 
     return filteredTodos;
   }

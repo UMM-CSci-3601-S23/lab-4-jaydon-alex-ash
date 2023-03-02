@@ -9,11 +9,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Pattern;
+//import java.util.Map;
+//import java.util.Objects;
+//import java.util.regex.Pattern;
 
-import javax.lang.model.util.ElementScanner14;
+//import javax.lang.model.util.ElementScanner14;
 
 import com.mongodb.client.MongoDatabase;
 /*import com.mongodb.client.model.Sorts;
@@ -109,25 +109,29 @@ public class TodoController {
   private Bson constructFilter(Context ctx) {
     List<Bson> filters = new ArrayList<>(); // start with a blank document
 
+    // Filter for the owner parameter
     if (ctx.queryParamMap().containsKey(OWNER_KEY)) {
       String targetOwner = ctx.queryParamAsClass(OWNER_KEY, String.class)
         .check(it -> it.length() > 0, "Todo's owner must have some value")
         .get();
       filters.add(regex(OWNER_KEY, targetOwner, "i"));
     }
+    // Filter for the status parameter
     if (ctx.queryParamMap().containsKey(STATUS_KEY)) {
       String targetStatus = ctx.queryParamAsClass(STATUS_KEY, String.class)
-        .check(it -> it.equalsIgnoreCase("complete") ||
-        it.equalsIgnoreCase("incomplete"), "Status parameter must be either complete or incomplete")
+        .check(it -> it.equalsIgnoreCase("complete")
+        || it.equalsIgnoreCase("incomplete"), "Status parameter must be either complete or incomplete")
         .get();
-      if(targetStatus.equalsIgnoreCase("complete"))
+      if (targetStatus.equalsIgnoreCase("complete")) {
         filters.add(eq(STATUS_KEY, true));
-      else
+      } else {
         filters.add(eq(STATUS_KEY, false));
+      }
     }
     // Combine the list of filters into a single filtering document.
     // if filters.isEmpty(), combinedFilter = new Document()
-    // else, combinedFilter = and(filters);*/
+    // else, combinedFilter = and(filters);
+    // ^ this doesn't need to be commented out, just showing what the ?: syntax does
     Bson combinedFilter = filters.isEmpty() ? new Document() : and(filters);
 
     return combinedFilter;
@@ -135,10 +139,10 @@ public class TodoController {
 
   private Bson constructSortingOrder(Context ctx) {
     // Sort the results. Use the `sortby` query param (default "name")
-    // as the field to sort by, and the query param `sortorder` (default
+    // as the field to sort by, and the query param `sortOrder` (default
     // "asc") to specify the sort order.
     /*String sortBy = Objects.requireNonNullElse(ctx.queryParam("sortby"), "name");
-    String sortOrder = Objects.requireNonNullElse(ctx.queryParam("sortorder"), "asc");
+    String sortOrder = Objects.requireNonNullElse(ctx.queryParam("sortOrder"), "asc");
     // if the sortOrder is "desc" then sortingOrder (Bson) = Sorts.descending() and whatever
     // we told Mongo to sort by (it'll be one of our HTTP parameters).
     Bson sortingOrder = sortOrder.equals("desc") ?  Sorts.descending(sortBy) : Sorts.ascending(sortBy);*/

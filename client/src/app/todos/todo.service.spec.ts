@@ -209,7 +209,7 @@ describe('todoService', () => {
     }));
   });
 
-  // We are filtering category, status, and body on the client.
+  // We are filtering category, and body on the client.
   describe('Filtering on the client using `filterTodos()` (Angular/Client filtering)', () => {
     /*
      * Since `filterTodos` actually filters "locally" (in
@@ -242,37 +242,7 @@ describe('todoService', () => {
         expect(todo.body.indexOf(todoBody)).toBeGreaterThanOrEqual(0);
       });
     });
-
-    it('filters by status', () => {
-      const todoStatus = 'incomplete';
-      const filteredTodos = todoService.filterTodos(testTodos, { status: 'incomplete' });
-      // There should be two todos that are incomplete.
-      expect(filteredTodos.length).toBe(2);
-      // Every returned todo's status should be false.
-      filteredTodos.forEach(todo => {
-        expect(todo.status === false);
-      });
     });
-
-    it('filters by status and body', () => {
-      // There's only one todo whose status
-      // is incomplete and whose body contains
-      // 'hello'. There are two whose status is
-      // incomplete and two whose body contains
-      // 'hello', so this should test combined filtering.
-      const todoStatus = 'incomplete';
-      const todoBody = 'Hello';
-      const filters = { status: todoStatus, body: todoBody };
-      const filteredTodos = todoService.filterTodos(testTodos, filters);
-      // There should be just one todo with these properties.
-      expect(filteredTodos.length).toBe(1);
-      // Every returned user should have _both_ these properties.
-      filteredTodos.forEach(todo => {
-        expect(todo.status === false);
-        expect(todo.body.indexOf(todoBody)).toBeGreaterThanOrEqual(0);
-      });
-    });
-  });
 
   // We can't test for adding todos yet, so we will put this in later.
   /*describe('Adding a todo using `addTodo()`', () => {

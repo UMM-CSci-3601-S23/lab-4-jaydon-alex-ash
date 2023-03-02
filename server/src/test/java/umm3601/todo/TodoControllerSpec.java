@@ -273,24 +273,55 @@ public class TodoControllerSpec {
     }));
   }
 
-  // Todo: figure out why this test and the one below it is failing
-  // Todo: add testing for invalid status
-  /*@Test
-  public void canGetTodosWithStatus() throws IOException {
+  @Test
+  public void canGetTodosWithStatusComplete() throws IOException {
     Map<String, List<String>> queryParams = new HashMap<>();
     queryParams.put(TodoController.STATUS_KEY, Arrays.asList(new String[] {"complete"}));
     when(ctx.queryParamMap()).thenReturn(queryParams);
-    when(ctx.queryParam(TodoController.STATUS_KEY)).thenReturn("complete");
+    Validator<String> validator = new Validator<String>("status", "complete", null);
+    when(ctx.queryParamAsClass(TodoController.STATUS_KEY, String.class)).thenReturn(validator);
 
     todoController.getTodos(ctx);
 
     verify(ctx).json(todoArrayListCaptor.capture());
     verify(ctx).status(HttpStatus.OK);
 
-    // Confirm that all the todos passed to `json` work for OHMNET.
+    // Confirm that all the todos passed to `json` are complete.
     for (Todo todo : todoArrayListCaptor.getValue()) {
       assertEquals(true, todo.status);
     }
+  }
+
+  @Test
+  public void canGetTodosWithStatusIncomplete() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put(TodoController.STATUS_KEY, Arrays.asList(new String[] {"incomplete"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Validator<String> validator = new Validator<String>("status", "incomplete", null);
+    when(ctx.queryParamAsClass(TodoController.STATUS_KEY, String.class)).thenReturn(validator);
+
+    todoController.getTodos(ctx);
+
+    verify(ctx).json(todoArrayListCaptor.capture());
+    verify(ctx).status(HttpStatus.OK);
+
+    // Confirm that all the todos passed to `json` are incomplete.
+    for (Todo todo : todoArrayListCaptor.getValue()) {
+      assertEquals(false, todo.status);
+    }
+  }
+
+  @Test
+  public void respondsAppropriatelyToInvalidStatus() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put(TodoController.STATUS_KEY, Arrays.asList(new String[] {"bad"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Validator<String> validator = new Validator<String>("status", "bad", null);
+    when(ctx.queryParamAsClass(TodoController.STATUS_KEY, String.class)).thenReturn(validator);
+
+    assertThrows(ValidationException.class, () -> {
+      todoController.getTodos(ctx);
+    });
   }
 
   @Test
@@ -299,9 +330,10 @@ public class TodoControllerSpec {
     queryParams.put(TodoController.OWNER_KEY, Arrays.asList(new String[] {"Egg"}));
     queryParams.put(TodoController.STATUS_KEY, Arrays.asList(new String[] {"incomplete"}));
     when(ctx.queryParamMap()).thenReturn(queryParams);
-    when(ctx.queryParam(TodoController.OWNER_KEY)).thenReturn("Egg");
-    when(ctx.queryParamAsClass(TodoController.STATUS_KEY, String.class))
-      .thenReturn(Validator.create(String.class, "incomplete", TodoController.STATUS_KEY));
+    Validator<String> ownerValidator = new Validator<String>("owner", "egg", null);
+    when(ctx.queryParamAsClass(TodoController.OWNER_KEY, String.class)).thenReturn(ownerValidator);
+    Validator<String> statusValidator = new Validator<String>("status", "incomplete", null);
+    when(ctx.queryParamAsClass(TodoController.STATUS_KEY, String.class)).thenReturn(statusValidator);
 
     todoController.getTodos(ctx);
 
@@ -312,7 +344,7 @@ public class TodoControllerSpec {
       assertEquals("Egg", todo.owner);
       assertEquals(false, todo.status);
     }
-  }*/
+  }
 
   @Test
   public void getTodoWithExistentId() throws IOException {

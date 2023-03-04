@@ -1,6 +1,9 @@
 <div class="flex-row">
     <div class="flex-1" fxFlex.gt-sm="80" fxFlexOffset.gt-sm="10">
-
+      <!-- this looks hideous but ... we aren't sure how to move it with angular's templates -->
+      <button mat-fab class="add-todo-fab" matTooltip="Add Todo" routerLink="/todos/new" data-test="addTodoButton" style="position:static">
+        <mat-icon class="md-24" aria-label="Add Todo">add</mat-icon>
+      </button>
       <mat-card appearance="outlined" class="search-card">
         <mat-card-title class="todo-list-title">Todos</mat-card-title>
         <mat-card-content class="flex-col" >
@@ -109,6 +112,5 @@
           </mat-error>
         </div>
       </ng-template>
-
 
 

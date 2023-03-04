@@ -10,14 +10,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 //import java.util.Map;
-//import java.util.Objects;
+import java.util.Objects;
 //import java.util.regex.Pattern;
 
 //import javax.lang.model.util.ElementScanner14;
 
 import com.mongodb.client.MongoDatabase;
-/*import com.mongodb.client.model.Sorts;
-import com.mongodb.client.result.DeleteResult;*/
+import com.mongodb.client.model.Sorts;
+//import com.mongodb.client.result.DeleteResult;
 
 import org.bson.Document;
 import org.bson.UuidRepresentation;
@@ -37,6 +37,7 @@ public class TodoController {
 
   static final String OWNER_KEY = "owner";
   static final String STATUS_KEY = "status";
+  static final String SORT_KEY = "orderBy";
 
   private final JacksonMongoCollection<Todo> todoCollection;
 
@@ -128,6 +129,17 @@ public class TodoController {
         filters.add(eq(STATUS_KEY, false));
       }
     }
+    // Filter for ordering by specific fields
+    /*if (ctx.queryParamMap().containsKey(SORT_KEY)) {
+      String targetOrder = ctx.queryParamAsClass(SORT_KEY, String.class)
+        .check(it -> it.equalsIgnoreCase("owner")
+        || it.equalsIgnoreCase("status")
+        || it.equalsIgnoreCase("body")
+        || it.equalsIgnoreCase("category"), "Can only be ordered by owner, status, body or category")
+        // Convert the string to lowercase so we can use it as a filter param more easily
+        .get().toLowerCase();
+      filters.add(Sorts.orderBy(targetOrder));
+    }*/
     // Combine the list of filters into a single filtering document.
     // if filters.isEmpty(), combinedFilter = new Document()
     // else, combinedFilter = and(filters);
@@ -141,12 +153,12 @@ public class TodoController {
     // Sort the results. Use the `sortby` query param (default "name")
     // as the field to sort by, and the query param `sortOrder` (default
     // "asc") to specify the sort order.
-    /*String sortBy = Objects.requireNonNullElse(ctx.queryParam("sortby"), "name");
+    String sortBy = Objects.requireNonNullElse(ctx.queryParam("sortBy"), "owner");
     String sortOrder = Objects.requireNonNullElse(ctx.queryParam("sortOrder"), "asc");
     // if the sortOrder is "desc" then sortingOrder (Bson) = Sorts.descending() and whatever
     // we told Mongo to sort by (it'll be one of our HTTP parameters).
-    Bson sortingOrder = sortOrder.equals("desc") ?  Sorts.descending(sortBy) : Sorts.ascending(sortBy);*/
-    return new Document();
+    Bson sortingOrder = sortOrder.equals("desc") ?  Sorts.descending(sortBy) : Sorts.ascending(sortBy);
+    return sortingOrder;
   }
 
   /**

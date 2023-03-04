@@ -35,7 +35,7 @@ export class TodoService {
         httpParams = httpParams.set('limit', filters.limit);
       }
       if(filters.sort){
-        httpParams = httpParams.set('orderBy', filters.sort);
+        httpParams = httpParams.set('sortBy', filters.sort);
       }
     }
 

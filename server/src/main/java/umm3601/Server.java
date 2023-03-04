@@ -82,6 +82,13 @@ public class Server {
     // Get the specified todo
     server.get("/api/todos/{id}", todoController::getTodos);
 
+    // Delete the specified user
+    //server.delete("/api/todos/{id}", todoController::deleteTodos);
+
+    // Add new user with the user info being in the JSON body
+    // of the HTTP request
+    server.post("/api/todos", todoController::addNewTodo);
+
     // This catches any uncaught exceptions thrown in the server
     // code and turns them into a 500 response ("Internal Server
     // Error Response"). In general you'll like to *never* actually

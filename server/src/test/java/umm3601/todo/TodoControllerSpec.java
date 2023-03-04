@@ -3,10 +3,10 @@ package umm3601.todo;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.argThat;
-//import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.eq;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertNotEquals;
-//import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-//import io.javalin.validation.BodyValidator;
+import io.javalin.validation.BodyValidator;
 import io.javalin.validation.ValidationException;
 import io.javalin.validation.Validator;
 //import umm3601.todo.Todo;
@@ -49,7 +49,7 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import io.javalin.http.NotFoundResponse;
-//import io.javalin.json.JavalinJackson;
+import io.javalin.json.JavalinJackson;
 
 /**
  * Tests the logic of the TodoController
@@ -76,7 +76,7 @@ public class TodoControllerSpec {
   private static MongoDatabase db;
 
   // Used to translate between JSON and POJOs.
-  //private static JavalinJackson javalinJackson = new JavalinJackson();
+  private static JavalinJackson javalinJackson = new JavalinJackson();
 
   @Mock
   private Context ctx;
@@ -382,14 +382,13 @@ public class TodoControllerSpec {
     assertEquals("The requested todo was not found", exception.getMessage());
   }
 
-  /*@Test
+  @Test
   public void addTodo() throws IOException {
     String testNewTodo = "{"
-        + "\"name\": \"Test Todo\","
-        + "\"age\": 25,"
-        + "\"company\": \"testers\","
-        + "\"email\": \"test@example.com\","
-        + "\"role\": \"viewer\""
+        + "\"owner\": \"AAAA\","
+        + "\"body\": AAAAAAAAAAAA,"
+        + "\"status\": true,"
+        + "\"category\": \"AAAAAAAAAAAAAAAAAAAAAAAAA\","
         + "}";
     when(ctx.bodyValidator(Todo.class))
       .then(value -> new BodyValidator<Todo>(testNewTodo, Todo.class, javalinJackson));
@@ -406,15 +405,13 @@ public class TodoControllerSpec {
 
     // Successfully adding the todo should return the newly generated, non-empty MongoDB ID for that todo.
     assertNotEquals("", addedTodo.get("_id"));
-    assertEquals("Test Todo", addedTodo.get("name"));
-    assertEquals(25, addedTodo.get(TodoController.AGE_KEY));
-    assertEquals("testers", addedTodo.get(TodoController.COMPANY_KEY));
-    assertEquals("test@example.com", addedTodo.get("email"));
-    assertEquals("viewer", addedTodo.get(TodoController.ROLE_KEY));
-    assertNotNull(addedTodo.get("avatar"));
+    assertEquals("AAAA", addedTodo.get("owner"));
+    assertEquals("AAAAAAAAAAAA", addedTodo.get("body"));
+    assertEquals(true, addedTodo.get(TodoController.STATUS_KEY));
+    assertEquals("AAAAAAAAAAAAAAAAAAAAAAAAA", addedTodo.get("category"));
   }
 
-  @Test
+  /*@Test
   public void addInvalidEmailTodo() throws IOException {
     String testNewTodo = "{"
         + "\"name\": \"Test Todo\","

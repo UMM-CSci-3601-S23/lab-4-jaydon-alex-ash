@@ -9,7 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.Map;
+import java.util.Map;
 import java.util.Objects;
 //import java.util.regex.Pattern;
 
@@ -38,6 +38,7 @@ public class TodoController {
   static final String OWNER_KEY = "owner";
   static final String STATUS_KEY = "status";
   static final String SORT_KEY = "orderBy";
+
 
   private final JacksonMongoCollection<Todo> todoCollection;
 
@@ -167,30 +168,18 @@ public class TodoController {
    *
    * @param ctx a Javalin HTTP context
    */
-  /*public void addNewTodo(Context ctx) {
+  public void addNewTodo(Context ctx) {
     /*
      * The follow chain of statements uses the Javalin validator system
      * to verify that instance of `Todo` provided in this context is
-     * a "legal" todo. It checks the following things (in order):
-     *    - The todo has a value for the name (`usr.name != null`)
-     *    - The todo name is not blank (`usr.name.length > 0`)
-     *    - The provided email is valid (matches EMAIL_REGEX)
-     *    - The provided age is > 0
-     *    - The provided role is valid (one of "admin", "editor", or "viewer")
-     *    - A non-blank company is provided
+     * a "legal" todo.
      */
-    /*
     Todo newTodo = ctx.bodyValidator(Todo.class)
-      .check(usr -> usr.name != null && usr.name.length() > 0, "Todo must have a non-empty todo name")
-      .check(usr -> usr.email.matches(EMAIL_REGEX), "Todo must have a legal email")
-      .check(usr -> usr.age > 0, "Todo's age must be greater than zero")
-      .check(usr -> usr.age < REASONABLE_AGE_LIMIT, "Todo's age must be less than " + REASONABLE_AGE_LIMIT)
-      .check(usr -> usr.role.matches(ROLE_REGEX), "Todo must have a legal todo role")
-      .check(usr -> usr.company != null && usr.company.length() > 0, "Todo must have a non-empty company name")
+      .check(todo -> todo.owner != null && todo.owner.length() > 0, "Todo must have a non-empty todo owner")
+      .check(todo -> todo.status || !todo.status, "Todo must have a legal status")
+      .check(todo -> todo.body != null && todo.body.length() > 0, "Todo's body must not be empty")
+      .check(todo -> todo.category != null && todo.category.length() > 0, "Todo's category must not be empty")
       .get();
-
-    // Generate a todo avatar (you won't need this part for todos)
-    newTodo.avatar = generateAvatar(newTodo.email);
 
     todoCollection.insertOne(newTodo);
 
@@ -200,7 +189,7 @@ public class TodoController {
     // See, e.g., https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
     // for a description of the various response codes.
     ctx.status(HttpStatus.CREATED);
-  }*/
+  }
 
   /**
    * Delete the todo specified by the `id` parameter in the request.
